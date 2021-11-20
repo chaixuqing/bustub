@@ -20,6 +20,7 @@
 #include "common/config.h"
 
 namespace bustub {
+static std::mutex mtx;
 
 /**
  * LRUReplacer implements the lru replacement policy, which approximates the Least Recently Used policy.
@@ -47,6 +48,8 @@ class LRUReplacer : public Replacer {
 
  private:
   // TODO(student): implement me!
+  std::vector<frame_id_t> buffer;
+  size_t capacity = 0;
 };
 
 }  // namespace bustub
