@@ -22,6 +22,8 @@
 namespace bustub {
 
 #define BPLUSTREE_TYPE BPlusTree<KeyType, ValueType, KeyComparator>
+#define IN_TREE_INTERNAL_PAGE_TYPE BPlusTreeInternalPage<KeyType, page_id_t, KeyComparator>
+#define IN_TREE_LEAF_PAGE_TYPE BPlusTreeLeafPage<KeyType, ValueType, KeyComparator>
 
 /**
  * Main class providing the API for the Interactive B+ Tree.
@@ -77,7 +79,18 @@ class BPlusTree {
   // read data from file and remove one by one
   void RemoveFromFile(const std::string &file_name, Transaction *transaction = nullptr);
   // expose for test purpose
-  Page *FindLeafPage(const KeyType &key, bool leftMost = false);
+  // ** WARNING: I ADD TWO ADDITIONAL ARGUMENTS IN THIS FUNCTION! **
+  Page *FindLeafPage(const KeyType &key, bool leftMost = false, int mode = 0, Transaction* transaction = nullptr);
+  // Dyy helper function
+  Page *SafelyGetFrame(page_id_t page_id, const std::string &logout_string);
+  // Dyy helper function
+  Page *SafelyNewPage(page_id_t *page_id, const std::string &logout_string);
+  // Dyy helper function
+  bool CheckSafe(BPlusTreePage* tree_ptr, int mode, bool is_root);
+  // Dyy helper function
+  void ReleaseLatchQueue(Transaction* transaction, int mode);
+  // Dyy helper function
+  void DeletePages(Transaction* transaction);
 
  private:
   void StartNewTree(const KeyType &key, const ValueType &value);
@@ -102,6 +115,8 @@ class BPlusTree {
 
   bool AdjustRoot(BPlusTreePage *node);
 
+  void SetRootPageId(int root_page_id);
+
   void UpdateRootPageId(int insert_record = 0);
 
   /* Debug Routines for FREE!! */
@@ -116,6 +131,7 @@ class BPlusTree {
   KeyComparator comparator_;
   int leaf_max_size_;
   int internal_max_size_;
+  ReaderWriterLatch root_id_latch_;
 };
 
 }  // namespace bustub
