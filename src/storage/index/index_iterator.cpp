@@ -59,7 +59,7 @@ INDEXITERATOR_TYPE &INDEXITERATOR_TYPE::operator++() {
   if (index_ >= leaf_ptr_->GetSize() - 1){
     page_id_t old_page_id = page_id_;
     Page* old_page_ptr = page_ptr_;
-
+  
     page_id_ = leaf_ptr_->GetNextPageId();
     leaf_ptr_ = SafelyGetAndLatchLeafPage();
 

@@ -30,9 +30,7 @@ template <size_t KeySize>
 class GenericKey {
  public:
   inline void SetFromKey(const Tuple &tuple) {
-    // initialize to 0
-    // By looking at Tuple::KeyFromTuple, it seems we will create a tuple only contains
-    // key columns
+    // intialize to 0
     memset(data_, 0, KeySize);
     memcpy(data_, tuple.GetData(), tuple.GetLength());
   }
@@ -74,8 +72,6 @@ class GenericKey {
 
 /**
  * Function object returns true if lhs < rhs, used for trees
- *
- * Dyy: really? I think object returns -1 if lhs < rhs
  */
 template <size_t KeySize>
 class GenericComparator {

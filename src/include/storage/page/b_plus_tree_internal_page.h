@@ -16,9 +16,11 @@
 
 namespace bustub {
 
-#define B_PLUS_TREE_INTERNAL_PAGE_TYPE BPlusTreeInternalPage<KeyType, ValueType, KeyComparator>
+#define B_PLUS_TREE_INTERNAL_PAGE_TYPE \
+  BPlusTreeInternalPage<KeyType, ValueType, KeyComparator>
 #define INTERNAL_PAGE_HEADER_SIZE 24
-#define INTERNAL_PAGE_SIZE ((PAGE_SIZE - INTERNAL_PAGE_HEADER_SIZE) / (sizeof(MappingType)))
+#define INTERNAL_PAGE_SIZE \
+  ((PAGE_SIZE - INTERNAL_PAGE_HEADER_SIZE) / (sizeof(MappingType)))
 /**
  * Store n indexed keys and n+1 child pointers (page_id) within internal page.
  * Pointer PAGE_ID(i) points to a subtree in which all keys K satisfy:
@@ -36,39 +38,44 @@ INDEX_TEMPLATE_ARGUMENTS
 class BPlusTreeInternalPage : public BPlusTreePage {
  public:
   // must call initialize method after "create" a new node
-  // Note: the last slot of `array` is saved in case of overflow,
-  // thus size == maxsize means overflow!
-  void Init(page_id_t page_id, page_id_t parent_id = INVALID_PAGE_ID, int max_size = INTERNAL_PAGE_SIZE);
+  void Init(page_id_t page_id, page_id_t parent_id = INVALID_PAGE_ID,
+            int max_size = INTERNAL_PAGE_SIZE);
 
   KeyType KeyAt(int index) const;
   void SetKeyAt(int index, const KeyType &key);
   void SetValueAt(int index, const ValueType &value);
+  void InsertAt(int index, MappingType pair);
   int ValueIndex(const ValueType &value) const;
   ValueType ValueAt(int index) const;
 
-  int IndexLookup(const KeyType &key, const KeyComparator &comparator) const;
   ValueType Lookup(const KeyType &key, const KeyComparator &comparator) const;
-  void PopulateNewRoot(const ValueType &old_value, const KeyType &new_key, const ValueType &new_value);
-  int InsertNodeAfter(const ValueType &old_value, const KeyType &new_key, const ValueType &new_value);
-  void InsertAt(int index, const KeyType &new_key, const ValueType &new_value);
+  void PopulateNewRoot(const ValueType &old_value, const KeyType &new_key,
+                       const ValueType &new_value);
+  int InsertNodeAfter(const ValueType &old_value, const KeyType &new_key,
+                      const ValueType &new_value);
   void Remove(int index);
   ValueType RemoveAndReturnOnlyChild();
-
-  // Split and Merge utility methods
-  void MoveAllTo(BPlusTreeInternalPage *recipient, const KeyType &middle_key, BufferPoolManager *buffer_pool_manager);
-  void MoveHalfTo(BPlusTreeInternalPage *recipient, BufferPoolManager *buffer_pool_manager);
-  void MoveFirstToEndOf(BPlusTreeInternalPage *recipient, const KeyType &middle_key,
-                        BufferPoolManager *buffer_pool_manager);
-  void MoveLastToFrontOf(BPlusTreeInternalPage *recipient, const KeyType &middle_key,
-                         BufferPoolManager *buffer_pool_manager);
-
-  //Set parent page id
   void SetParentToMe(page_id_t page_id, BufferPoolManager *buffer_pool_manager);
 
+  // Split and Merge utility methods
+  void MoveAllTo(BPlusTreeInternalPage *recipient, const KeyType &middle_key,
+                 BufferPoolManager *buffer_pool_manager);
+  void MoveHalfTo(BPlusTreeInternalPage *recipient,
+                  BufferPoolManager *buffer_pool_manager);
+  void MoveFirstToEndOf(BPlusTreeInternalPage *recipient,
+                        const KeyType &middle_key,
+                        BufferPoolManager *buffer_pool_manager);
+  void MoveLastToFrontOf(BPlusTreeInternalPage *recipient,
+                         const KeyType &middle_key,
+                         BufferPoolManager *buffer_pool_manager);
+
  private:
-  void CopyNFrom(MappingType *items, int size, BufferPoolManager *buffer_pool_manager);
-  void CopyLastFrom(const MappingType &pair, BufferPoolManager *buffer_pool_manager);
-  void CopyFirstFrom(const MappingType &pair, BufferPoolManager *buffer_pool_manager);
+  void CopyNFrom(MappingType *items, int size,
+                 BufferPoolManager *buffer_pool_manager);
+  void CopyLastFrom(const MappingType &pair,
+                    BufferPoolManager *buffer_pool_manager);
+  void CopyFirstFrom(const MappingType &pair,
+                     BufferPoolManager *buffer_pool_manager);
   MappingType array[0];
 };
 }  // namespace bustub

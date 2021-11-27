@@ -21,8 +21,9 @@
 namespace bustub {
 
 #define MappingType std::pair<KeyType, ValueType>
-
-#define INDEX_TEMPLATE_ARGUMENTS template <typename KeyType, typename ValueType, typename KeyComparator>
+#define B_PLUS_TREE_PAGE_TYPE BPlusTreePage<KeyType, ValueType, KeyComparator>
+#define INDEX_TEMPLATE_ARGUMENTS \
+  template <typename KeyType, typename ValueType, typename KeyComparator>
 
 // define page type enum
 enum class IndexPageType { INVALID_INDEX_PAGE = 0, LEAF_PAGE, INTERNAL_PAGE };
@@ -53,6 +54,7 @@ class BPlusTreePage {
   int GetMaxSize() const;
   void SetMaxSize(int max_size);
   int GetMinSize() const;
+
   page_id_t GetParentPageId() const;
   void SetParentPageId(page_id_t parent_page_id);
 

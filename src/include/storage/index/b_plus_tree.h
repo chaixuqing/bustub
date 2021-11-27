@@ -22,9 +22,10 @@
 namespace bustub {
 
 #define BPLUSTREE_TYPE BPlusTree<KeyType, ValueType, KeyComparator>
-#define IN_TREE_INTERNAL_PAGE_TYPE BPlusTreeInternalPage<KeyType, page_id_t, KeyComparator>
-#define IN_TREE_LEAF_PAGE_TYPE BPlusTreeLeafPage<KeyType, ValueType, KeyComparator>
-
+#define IN_TREE_INTERNAL_PAGE_TYPE \
+  BPlusTreeInternalPage<KeyType, page_id_t, KeyComparator>
+#define IN_TREE_LEAF_PAGE_TYPE \
+  BPlusTreeLeafPage<KeyType, ValueType, KeyComparator>
 /**
  * Main class providing the API for the Interactive B+ Tree.
  *
@@ -41,20 +42,26 @@ class BPlusTree {
   using LeafPage = BPlusTreeLeafPage<KeyType, ValueType, KeyComparator>;
 
  public:
-  explicit BPlusTree(std::string name, BufferPoolManager *buffer_pool_manager, const KeyComparator &comparator,
-                     int leaf_max_size = LEAF_PAGE_SIZE, int internal_max_size = INTERNAL_PAGE_SIZE);
+  explicit BPlusTree(std::string name, BufferPoolManager *buffer_pool_manager,
+                     const KeyComparator &comparator,
+                     int leaf_max_size = LEAF_PAGE_SIZE,
+                     int internal_max_size = INTERNAL_PAGE_SIZE);
 
   // Returns true if this B+ tree has no keys and values.
   bool IsEmpty() const;
 
   // Insert a key-value pair into this B+ tree.
-  bool Insert(const KeyType &key, const ValueType &value, Transaction *transaction = nullptr);
+  bool Insert(const KeyType &key, const ValueType &value,
+              Transaction *transaction = nullptr);
 
   // Remove a key and its value from this B+ tree.
   void Remove(const KeyType &key, Transaction *transaction = nullptr);
 
+  void DeletePages(Transaction *transaction);
+
   // return the value associated with a given key
-  bool GetValue(const KeyType &key, std::vector<ValueType> *result, Transaction *transaction = nullptr);
+  bool GetValue(const KeyType &key, std::vector<ValueType> *result,
+                Transaction *transaction = nullptr);
 
   // index iterator
   INDEXITERATOR_TYPE begin();
@@ -62,42 +69,42 @@ class BPlusTree {
   INDEXITERATOR_TYPE end();
 
   void Print(BufferPoolManager *bpm) {
-    ToString(reinterpret_cast<BPlusTreePage *>(bpm->FetchPage(root_page_id_)->GetData()), bpm);
+    ToString(reinterpret_cast<BPlusTreePage *>(
+                 bpm->FetchPage(root_page_id_)->GetData()),
+             bpm);
   }
 
   void Draw(BufferPoolManager *bpm, const std::string &outf) {
     std::ofstream out(outf);
     out << "digraph G {" << std::endl;
-    ToGraph(reinterpret_cast<BPlusTreePage *>(bpm->FetchPage(root_page_id_)->GetData()), bpm, out);
+    ToGraph(reinterpret_cast<BPlusTreePage *>(
+                bpm->FetchPage(root_page_id_)->GetData()),
+            bpm, out);
     out << "}" << std::endl;
     out.close();
   }
 
   // read data from file and insert one by one
-  void InsertFromFile(const std::string &file_name, Transaction *transaction = nullptr);
+  void InsertFromFile(const std::string &file_name,
+                      Transaction *transaction = nullptr);
 
   // read data from file and remove one by one
-  void RemoveFromFile(const std::string &file_name, Transaction *transaction = nullptr);
+  void RemoveFromFile(const std::string &file_name,
+                      Transaction *transaction = nullptr);
   // expose for test purpose
-  // ** WARNING: I ADD TWO ADDITIONAL ARGUMENTS IN THIS FUNCTION! **
-  Page *FindLeafPage(const KeyType &key, bool leftMost = false, int mode = 0, Transaction* transaction = nullptr);
-  // Dyy helper function
-  Page *SafelyGetFrame(page_id_t page_id, const std::string &logout_string);
-  // Dyy helper function
-  Page *SafelyNewPage(page_id_t *page_id, const std::string &logout_string);
-  // Dyy helper function
-  bool CheckSafe(BPlusTreePage* tree_ptr, int mode, bool is_root);
-  // Dyy helper function
-  void ReleaseLatchQueue(Transaction* transaction, int mode);
-  // Dyy helper function
-  void DeletePages(Transaction* transaction);
+  Page *FindLeafPage(const KeyType &key, bool leftMost = false, int mode = 0,
+                     Transaction *transaction = nullptr);
+  void ReleaseLatchQueue(Transaction *transaction, int mode);
+  bool CheckSafe(BPlusTreePage *tree_ptr = nullptr, int mode = 0);
 
  private:
   void StartNewTree(const KeyType &key, const ValueType &value);
 
-  bool InsertIntoLeaf(const KeyType &key, const ValueType &value, Transaction *transaction = nullptr);
+  bool InsertIntoLeaf(const KeyType &key, const ValueType &value,
+                      Transaction *transaction = nullptr);
 
-  void InsertIntoParent(BPlusTreePage *old_node, const KeyType &key, BPlusTreePage *new_node,
+  void InsertIntoParent(BPlusTreePage *old_node, const KeyType &key,
+                        BPlusTreePage *new_node,
                         Transaction *transaction = nullptr);
 
   template <typename N>
@@ -107,20 +114,21 @@ class BPlusTree {
   bool CoalesceOrRedistribute(N *node, Transaction *transaction = nullptr);
 
   template <typename N>
-  bool Coalesce(N **neighbor_node, N **node, BPlusTreeInternalPage<KeyType, page_id_t, KeyComparator> **parent,
-                int index, Transaction *transaction = nullptr);
+  bool Coalesce(
+      N **neighbor_node, N **node,
+      BPlusTreeInternalPage<KeyType, page_id_t, KeyComparator> **parent,
+      int index, Transaction *transaction = nullptr);
 
   template <typename N>
   void Redistribute(N *neighbor_node, N *node, int index);
 
   bool AdjustRoot(BPlusTreePage *node);
 
-  void SetRootPageId(int root_page_id);
-
   void UpdateRootPageId(int insert_record = 0);
 
   /* Debug Routines for FREE!! */
-  void ToGraph(BPlusTreePage *page, BufferPoolManager *bpm, std::ofstream &out) const;
+  void ToGraph(BPlusTreePage *page, BufferPoolManager *bpm,
+               std::ofstream &out) const;
 
   void ToString(BPlusTreePage *page, BufferPoolManager *bpm) const;
 
